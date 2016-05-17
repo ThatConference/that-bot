@@ -63,6 +63,8 @@ This bot demonstrates many of the core features of Botkit:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+var http = require('http');
+
 var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
 if (!process.env.token) {
@@ -152,7 +154,7 @@ controller.hears(['that conference'], ['ambient'], function(bot, message) {
     });
 });
 
-controller.hears(['hello', 'hi'], allContactTypes, function(bot, message) {
+controller.hears(['hello', 'hi', 'yo'], allContactTypes, function(bot, message) {
 
     bot.api.reactions.add({
         timestamp: message.ts,
@@ -257,7 +259,77 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
     });
 });
 
+controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
+    var speakerName = message.match[1];
+    
+    //call that conference.
+    //search through the list of speakers
+    //return the bio with a link to the page..
+    
+    
+    var url = 'https://www.thatconference.com';
+    var options = {
+        host: url,
+        port: 80,
+        path: '/api3/Speakers/GetSpeakers?year=2016',
+        method: 'GET'
+    };
 
+    http.request(options, function(res) {
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            var speakers = JSON.parse(chunk);
+            
+            for (var speakers in speakers) {
+                if (true){
+                 
+                    bot.reply(message, 'speaker name:' + speakerName);
+                    
+                }
+            }
+            
+            
+        });
+    }).end();
+
+    
+    
+    
+});
+
+controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'],
+    'direct_message,direct_mention,mention', function(bot, message) {
+
+        var hostname = os.hostname();
+        var uptime = formatUptime(process.uptime());
+
+        bot.reply(message,
+            ':robot_face: I am a bot named <@' + bot.identity.name +
+             '>. I have been running for ' + uptime + ' on ' + hostname + '.');
+
+});
+
+function formatUptime(uptime) {
+    var unit = 'second';
+    if (uptime > 60) {
+        uptime = uptime / 60;
+        unit = 'minute';
+    }
+    if (uptime > 60) {
+        uptime = uptime / 60;
+        unit = 'hour';
+    }
+    if (uptime != 1) {
+        unit = unit + 's';
+    }
+
+    uptime = uptime + ' ' + unit;
+    return uptime;
+}
+
+/*
 controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function(bot, message) {
 
     bot.startConversation(message, function(err, convo) {
@@ -284,34 +356,4 @@ controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function
         ]);
     });
 });
-
-
-controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'],
-    'direct_message,direct_mention,mention', function(bot, message) {
-
-        var hostname = os.hostname();
-        var uptime = formatUptime(process.uptime());
-
-        bot.reply(message,
-            ':robot_face: I am a bot named <@' + bot.identity.name +
-             '>. I have been running for ' + uptime + ' on ' + hostname + '.');
-
-    });
-
-function formatUptime(uptime) {
-    var unit = 'second';
-    if (uptime > 60) {
-        uptime = uptime / 60;
-        unit = 'minute';
-    }
-    if (uptime > 60) {
-        uptime = uptime / 60;
-        unit = 'hour';
-    }
-    if (uptime != 1) {
-        unit = unit + 's';
-    }
-
-    uptime = uptime + ' ' + unit;
-    return uptime;
-}
+*/
