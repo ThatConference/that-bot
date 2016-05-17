@@ -261,8 +261,8 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
 });
 
 controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
-    
     var speakerName = message.match[1];
+    bot.reply(message, 'OK! Let me look up: ' + speakerName );
     
     var options = {
         host: 'www.thatconference.com',
@@ -271,18 +271,43 @@ controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_m
         method: 'GET'
     };
 
+    var responseData = '';
+    
     https.request(options, function(res) {
         console.log('STATUS: ' + res.statusCode);
         console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
+        
         res.on('data', function (chunk) {
-            var speakers = JSON.parse(chunk);
-            for (var speaker in speakers) {
-                if (speaker.FirstName == speakerName || speaker.LastName == speakerName ){
-                    bot.reply(message, speaker.Biography);
-                }
-            }
+            responseData += chunk;
         });
+        
+        res.on('end', () => {
+            var speakers = JSON.parse(responseData);
+            for (var speaker of speakers) {
+                
+                // how can we make the response nicer.
+                if (speaker.FirstName.toUpperCase() == speakerName.toUpperCase() || speaker.LastName.toUpperCase() == speakerName.toUpperCase() ){
+                    
+                    var reply_with_attachments = {
+                        'username': speaker.FirstName + ' ' + speaker.LastName,
+                        'text': speaker.WebSite,
+                        'attachments': [
+                        {
+                            'fallback': speaker.Biography,
+                            'title': speaker.Title + ' ' + speaker.Company,
+                            'text': speaker.Biography,
+                            'color': '#7CD197'
+                        }
+                        ],
+                        'icon_url': 'http://thatconference.com' + speaker.HeadShot
+                        }
+
+                    bot.reply(message, reply_with_attachments);
+                }
+            }    
+        })
+  
     }).end();
 });
 
