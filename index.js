@@ -63,7 +63,7 @@ This bot demonstrates many of the core features of Botkit:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-var allContactTypes = 'direct_message,direct_mention,mention';
+var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
 if (!process.env.token) {
     console.log('Error: Specify token in environment');
@@ -82,7 +82,7 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-controller.hears(['that conference'], allContactTypes, function(bot, message) {
+controller.hears(['that conference'], ['ambient'], function(bot, message) {
     bot.startConversation(message, function(err, convo) {
         if (!err) {
             var stop = {
