@@ -75,6 +75,7 @@ var os = require('os');
 
 var controller = Botkit.slackbot({
     debug: true,
+    logLevel: 2
 });
 
 var bot = controller.spawn({
@@ -85,14 +86,15 @@ controller.hears(['that conference'], allContactTypes, function(bot, message) {
     bot.startConversation(message, function(err, convo) {
         if (!err) {
             var stop = {
-                pattern: 'stop',
+                pattern: ['stop', 'no', 'OMG'],
                 callback: function(response, convo) {
+                    convo.say('well, you asked...');
                     convo.stop();
                 }
             };
             
             var what = {
-                pattern: 'what?',
+                pattern: ['what?', 'ummm...'],
                 callback: function(response, convo) {
                     convo.repeat();
                     convo.next();
@@ -101,7 +103,7 @@ controller.hears(['that conference'], allContactTypes, function(bot, message) {
             
             convo.ask('which conference?', [
                 {
-                    pattern: 'that conference',
+                    pattern: ['that conference'],
                     callback: function(response, convo) {
                         convo.ask('this conference?', [
                             {
@@ -111,13 +113,14 @@ controller.hears(['that conference'], allContactTypes, function(bot, message) {
                                         {
                                             pattern: 'no',
                                             callback: function(response, convo) {
-                                                convo.repeat();
-                                                convo.next();
+                                                convo.say("well now I'm confused");
+                                                convo.stop();
                                             }
                                         },
                                         stop,
                                         what
                                     ]);
+                                    convo.next();
                                 }
                             },
                             {
@@ -130,6 +133,7 @@ controller.hears(['that conference'], allContactTypes, function(bot, message) {
                             stop,
                             what
                         ]);
+                        convo.next();
                     }
                 },
                 stop,
