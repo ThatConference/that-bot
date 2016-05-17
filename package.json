@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/ThatConference/that-bot/issues"
   },
-  "homepage": "https://github.com/ThatConference/that-bot#readme"
+  "homepage": "https://github.com/ThatConference/that-bot#readme",
+  "dependencies": {
+    "botkit": "^0.1.1"
+  }
 }
