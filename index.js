@@ -64,6 +64,7 @@ This bot demonstrates many of the core features of Botkit:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 var http = require('http');
+var https = require('https');
 
 var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
@@ -260,43 +261,29 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
 });
 
 controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
+    
     var speakerName = message.match[1];
     
-    //call that conference.
-    //search through the list of speakers
-    //return the bio with a link to the page..
-    
-    
-    var url = 'https://www.thatconference.com';
     var options = {
-        host: url,
-        port: 80,
+        host: 'www.thatconference.com',
+        port: 443,
         path: '/api3/Speakers/GetSpeakers?year=2016',
         method: 'GET'
     };
 
-    http.request(options, function(res) {
+    https.request(options, function(res) {
         console.log('STATUS: ' + res.statusCode);
         console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             var speakers = JSON.parse(chunk);
-            
-            for (var speakers in speakers) {
-                if (true){
-                 
-                    bot.reply(message, 'speaker name:' + speakerName);
-                    
+            for (var speaker in speakers) {
+                if (speaker.FirstName == speakerName || speaker.LastName == speakerName ){
+                    bot.reply(message, speaker.Biography);
                 }
             }
-            
-            
         });
     }).end();
-
-    
-    
-    
 });
 
 controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'],
