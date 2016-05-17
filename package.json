@@ -1,0 +1,28 @@
+{
+  "name": "that-bot",
+  "version": "0.0.1",
+  "description": "It's That Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "exec test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThatConference/that-bot.git"
+  },
+  "keywords": [
+    "bots",
+    "bots",
+    "bots",
+    "Slack",
+    "That",
+    "Conference",
+    "bots"
+  ],
+  "author": "Bots",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThatConference/that-bot/issues"
+  },
+  "homepage": "https://github.com/ThatConference/that-bot#readme"
+}
