@@ -23,25 +23,25 @@ var bot = controller.spawn({
 
 controller.hears('cognitive test', ['ambient'], function(bot, message) {
    bot.reply(message, 'on it, boss');
-   
+
    var responseData;
    var postData = querystring.stringify({
        'language' : 'en',
        'analyzerIds' : ['08ea174b-bfdb-4e64-987e-602f85da7f72'],
-       'text' : 'Hi, Tom! How are you today?' 
+       'text' : 'Hi, Tom! How are you today?'
    });
-   
+
    var options = {
        host: 'api.projectoxford.ai',
-       path: '/linguistics/v1.0/analyze',       
+       path: '/linguistics/v1.0/analyze',
        method: 'POST',
-       headers: { 
+       headers: {
            'Content-Type': 'application/json',
            'Cache-Control': 'no-cache',
             'Ocp-Apim-Subscription-Key': '02829fac842a458d9fa90242754c6721', //replace with process.env.MSCSToken
        }
    };
-   
+
    var req = https.request(options, (res) => {
       res.setEncoding('utf8');
       res.on('data', (chunk) => {
@@ -49,13 +49,13 @@ controller.hears('cognitive test', ['ambient'], function(bot, message) {
       });
       res.on('end', () => {
         bot.reply(message, responseData);
-      })    
+      })
    });
-   
+
    req.on('error', (e) => {
     console.log(`problem with request: ${e.message}`);
    });
-   
+
    req.write(postData);
    req.end();
 });
@@ -70,7 +70,7 @@ controller.hears(['that conference'], ['ambient'], function(bot, message) {
                     convo.stop();
                 }
             };
-            
+
             var what = {
                 pattern: ['what?', 'ummm...'],
                 callback: function(response, convo) {
@@ -78,7 +78,7 @@ controller.hears(['that conference'], ['ambient'], function(bot, message) {
                     convo.next();
                 }
             };
-            
+
             convo.ask('which conference?', [
                 {
                     pattern: ['that conference'],
@@ -117,7 +117,7 @@ controller.hears(['that conference'], ['ambient'], function(bot, message) {
                 stop,
                 what
             ]);
-            
+
             convo.on('end', function(convo) {
                 if (convo.status == 'completed') {
                     bot.reply(message, 'OK! That Conference');
@@ -238,7 +238,7 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
 controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
     var speakerName = message.match[1];
     bot.reply(message, 'OK! Let me look up: ' + speakerName );
-    
+
     var options = {
         host: 'www.thatconference.com',
         port: 443,
@@ -247,23 +247,24 @@ controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_m
     };
 
     var responseData = '';
-    
+
     https.request(options, function(res) {
         console.log('STATUS: ' + res.statusCode);
         console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
-        
+
         res.on('data', function (chunk) {
             responseData += chunk;
         });
-        
+
         res.on('end', () => {
+            var found = false;
             var speakers = JSON.parse(responseData);
             for (var speaker of speakers) {
-                
+
                 // how can we make the response nicer.
                 if (speaker.FirstName.toUpperCase() == speakerName.toUpperCase() || speaker.LastName.toUpperCase() == speakerName.toUpperCase() ){
-                    
+                    found = true;
                     var reply_with_attachments = {
                         'username': speaker.FirstName + ' ' + speaker.LastName,
                         'text': speaker.WebSite,
@@ -280,9 +281,16 @@ controller.hears(['about (.*)', 'tell me about (.*)', 'speaker (.*)'], 'direct_m
 
                     bot.reply(message, reply_with_attachments);
                 }
-            }    
+            }
+
+            if ( !found ) {
+              console.log('res end');
+              bot.reply(message, "Well I can't seem to find " +  speakerName + ". Is that their full name?");
+              found = false;
+            }
+
         })
-  
+
     }).end();
 });
 
