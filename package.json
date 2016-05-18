@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/ThatConference/that-bot#readme",
   "dependencies": {
-    "botkit": "^0.1.1"
+    "botkit": "^0.1.1",
+    "q": "^1.4.1"
   }
 }

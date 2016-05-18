@@ -1,6 +1,7 @@
 var http = require('http');
 var https = require('https');
-var querystring = require('querystring');
+var Q = require('q');
+var cognitiveServices = require('./scripts/cognitive-services');
 
 var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
@@ -21,43 +22,12 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-controller.hears('cognitive test', ['ambient'], function(bot, message) {
-   bot.reply(message, 'on it, boss');
-
-   var responseData;
-   var postData = querystring.stringify({
-       'language' : 'en',
-       'analyzerIds' : ['08ea174b-bfdb-4e64-987e-602f85da7f72'],
-       'text' : 'Hi, Tom! How are you today?'
-   });
-
-   var options = {
-       host: 'api.projectoxford.ai',
-       path: '/linguistics/v1.0/analyze',
-       method: 'POST',
-       headers: {
-           'Content-Type': 'application/json',
-           'Cache-Control': 'no-cache',
-            'Ocp-Apim-Subscription-Key': '02829fac842a458d9fa90242754c6721', //replace with process.env.MSCSToken
-       }
-   };
-
-   var req = https.request(options, (res) => {
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => {
-          responseData += chunk;
-      });
-      res.on('end', () => {
-        bot.reply(message, responseData);
-      })
-   });
-
-   req.on('error', (e) => {
-    console.log(`problem with request: ${e.message}`);
-   });
-
-   req.write(postData);
-   req.end();
+controller.hears('(.*)', allContactTypes, function(bot, message) {
+    bot.reply(message, 'I am at your service');
+    
+    cognitiveServices.analyzeText(message).then(function (analyzedText) {
+        bot.reply(message, analyzedText);
+    });
 });
 
 controller.hears(['that conference'], ['ambient'], function(bot, message) {
