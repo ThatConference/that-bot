@@ -2,6 +2,7 @@ var http = require('http');
 var https = require('https');
 var Q = require('q');
 var cognitiveServices = require('./scripts/cognitive-services');
+var gifGrabber = require('./scripts/gif-grabber')
 
 var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
@@ -22,16 +23,22 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-controller.hears('(.*)', allContactTypes, function(bot, message) {
+/*controller.hears('(.*)', allContactTypes, function(bot, message) {
     bot.reply(message, 'I am at your service');
     
     cognitiveServices.analyzeText(message).then(function (analyzedText) {
         bot.reply(message, analyzedText);
     });
-});
+});*/
 
-controller.hears(['bacon'], ['ambient'], function(bot, message) {
-    //Post a response message with a GIF and a PIG reaction
+controller.hears(['(Bacon|bacon)'], ['ambient'], function(bot, message) {
+    gifGrabber.getRandomGif('bacon').then(function(response) {
+        var responseJSON = JSON.parse(response);
+        bot.reply(message, {
+            text: responseJSON.data.url,
+            icon_emoji: ":pig:",
+        });
+    });
 });
 
 controller.hears(['that conference'], ['ambient'], function(bot, message) {
