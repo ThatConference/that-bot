@@ -21,7 +21,7 @@ module.exports = {
                 'Content-Type': 'application/json',
                 'Content-Length': postData.length,
                 'Cache-Control': 'no-cache',
-                'Ocp-Apim-Subscription-Key': '02829fac842a458d9fa90242754c6721', //replace with process.env.MSCSToken
+                'Ocp-Apim-Subscription-Key': process.env.MSCSToken,
             }
         };
         

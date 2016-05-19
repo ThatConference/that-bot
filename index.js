@@ -22,13 +22,17 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-/*controller.hears('(.*)', allContactTypes, function(bot, message) {
+controller.hears('(.*)', allContactTypes, function(bot, message) {
     bot.reply(message, 'I am at your service');
     
     cognitiveServices.analyzeText(message).then(function (analyzedText) {
         bot.reply(message, analyzedText);
     });
-});*/
+});
+
+controller.hears(['bacon'], ['ambient'], function(bot, message) {
+    //Post a response message with a GIF and a PIG reaction
+});
 
 controller.hears(['that conference'], ['ambient'], function(bot, message) {
     bot.startConversation(message, function(err, convo) {
