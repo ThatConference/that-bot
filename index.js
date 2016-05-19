@@ -2,7 +2,8 @@ var http = require('http');
 var https = require('https');
 var Q = require('q');
 var cognitiveServices = require('./scripts/cognitive-services');
-var gifGrabber = require('./scripts/gif-grabber')
+var gifGrabber = require('./scripts/gif-grabber');
+var baconTime = require('./scripts/bacon-time');
 
 var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
@@ -30,6 +31,14 @@ var bot = controller.spawn({
         bot.reply(message, analyzedText);
     });
 });*/
+
+controller.hears('(time to bacon|how long to bacon|how long until bacon)', allContactTypes, function(bot, message) {
+    var timeToBacon = baconTime.timeToBacon();
+    
+    bot.reply(message, "Bacon will be delivered to your mouth in " + timeToBacon.days + " days");
+    bot.reply(message, "that's " + timeToBacon.hours + " hours");
+    bot.reply(message, "or " + timeToBacon.seconds + " seconds");
+});
 
 controller.hears(['(Bacon|bacon)'], ['ambient'], function(bot, message) {
     gifGrabber.getRandomGif('bacon').then(function(response) {
