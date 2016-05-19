@@ -32,7 +32,7 @@ var bot = controller.spawn({
     });
 });*/
 
-controller.hears('(time to bacon|how long to bacon|how long until bacon)', allContactTypes, function(bot, message) {
+controller.hears('(time to bacon|how long (to|til|until|til) bacon)', allContactTypes, function(bot, message) {
     var timeToBacon = baconTime.timeToBacon();
     
     bot.reply(message, "Bacon will be delivered to your mouth in " + timeToBacon.days + " days");
