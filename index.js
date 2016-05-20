@@ -33,7 +33,7 @@ controller.hears('cognitive test', ['ambient'], function(bot, message) {
 
    var options = {
        host: 'api.projectoxford.ai',
-       path: '/linguistics/v1.0/analyze',
+
        method: 'POST',
        headers: {
            'Content-Type': 'application/json',
