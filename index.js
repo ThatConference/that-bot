@@ -1,6 +1,9 @@
 var http = require('http');
 var https = require('https');
-var querystring = require('querystring');
+var Q = require('q');
+var cognitiveServices = require('./scripts/cognitive-services');
+var gifGrabber = require('./scripts/gif-grabber');
+var baconTime = require('./scripts/bacon-time');
 
 var allContactTypes = ['direct_message', 'direct_mention', 'mention'];
 
@@ -21,43 +24,22 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-controller.hears('cognitive test', ['ambient'], function(bot, message) {
-   bot.reply(message, 'on it, boss');
+controller.hears('(time to bacon|how long (to|til|until|til) bacon)', allContactTypes, function(bot, message) {
+    var timeToBacon = baconTime.timeToBacon();
 
-   var responseData;
-   var postData = querystring.stringify({
-       'language' : 'en',
-       'analyzerIds' : ['08ea174b-bfdb-4e64-987e-602f85da7f72'],
-       'text' : 'Hi, Tom! How are you today?'
-   });
+    bot.reply(message, "Bacon will be delivered to your mouth in " + timeToBacon.days + " days");
+    bot.reply(message, "that's " + timeToBacon.hours + " hours");
+    bot.reply(message, "or " + timeToBacon.seconds + " seconds");
+});
 
-   var options = {
-       host: 'api.projectoxford.ai',
-
-       method: 'POST',
-       headers: {
-           'Content-Type': 'application/json',
-           'Cache-Control': 'no-cache',
-            'Ocp-Apim-Subscription-Key': '02829fac842a458d9fa90242754c6721', //replace with process.env.MSCSToken
-       }
-   };
-
-   var req = https.request(options, (res) => {
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => {
-          responseData += chunk;
-      });
-      res.on('end', () => {
-        bot.reply(message, responseData);
-      })
-   });
-
-   req.on('error', (e) => {
-    console.log(`problem with request: ${e.message}`);
-   });
-
-   req.write(postData);
-   req.end();
+controller.hears(['(Bacon|bacon)'], ['ambient'], function(bot, message) {
+    gifGrabber.getRandomGif('bacon').then(function(response) {
+        var responseJSON = JSON.parse(response);
+        bot.reply(message, {
+            text: responseJSON.data.url,
+            icon_emoji: ":pig:",
+        });
+    });
 });
 
 controller.hears(['that conference'], ['ambient'], function(bot, message) {
