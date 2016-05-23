@@ -8,7 +8,7 @@ module.exports = {
         
         var options = {
             host: 'api.giphy.com',
-            path: '/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=' + term,       
+            path: '/v1/gifs/random?api_key=dc6zaTOxFJmzC&rating=pg&tag=' + term,       
             port: 80,
             method: 'GET',
             headers: { 
